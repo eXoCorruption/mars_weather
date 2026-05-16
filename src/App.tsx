@@ -19,7 +19,6 @@ function App() {
   const [weatherData, setWeatherData] = useState<MarsWeather | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedSol, setSelectedSol] = useState<number | null>(null)
 
   const API_KEY = import.meta.env.VITE_NASA_API_KEY
 
@@ -57,7 +56,6 @@ function App() {
             terrestrial_date: latestData.terrestrial_date || 'N/A'
           }
           setWeatherData(weather)
-          setSelectedSol(latestSol)
         }
       }
     } catch (err) {
