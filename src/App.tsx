@@ -18,7 +18,6 @@ interface MarsWeather {
 function App() {
   const [weatherData, setWeatherData] = useState<MarsWeather | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   const API_KEY = import.meta.env.VITE_NASA_API_KEY
 
@@ -89,13 +88,6 @@ function App() {
         <div className="loading">
           <div className="spinner"></div>
           <p>Connecting to Mars...</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="error-message">
-          <p>{error}</p>
-          <button onClick={fetchMarsWeather}>Retry</button>
         </div>
       )}
 
