@@ -28,44 +28,8 @@ function App() {
 
   const fetchMarsWeather = async () => {
     try {
-      setLoading(true)
-      setError(null)
-
-      // Try fetching from NASA Mars Rover API
-      try {
-        const response = await axios.get('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos', {
-          params: {
-            api_key: API_KEY,
-            sol: 0,
-            page: 1
-          },
-          headers: {
-            'Accept': 'application/json'
-          }
-        })
-
-        if (response.data && response.data.photos && response.data.photos.length > 0) {
-          const photo = response.data.photos[0]
-          const weather: MarsWeather = {
-            sol: photo.sol || 4000,
-            avgTemp: -75,
-            maxTemp: -40,
-            minTemp: -120,
-            pressure: 650,
-            windSpeed: 15,
-            sunDuration: 0,
-            season: 'Unknown',
-            terrestrial_date: photo.earth_date || new Date().toISOString().split('T')[0]
-          }
-          setWeatherData(weather)
-          return
-        }
-      } catch (apiErr) {
-        console.log('Mars Rover API failed, using demo data:', apiErr)
-      }
-
-      // Fallback: Use realistic Mars weather demo data
-      const weather: MarsWeather = {
+      // Set demo data immediately as fallback
+      const demoWeather: MarsWeather = {
         sol: 4000,
         avgTemp: -75,
         maxTemp: -40,
@@ -76,11 +40,40 @@ function App() {
         season: 'Ls 180°',
         terrestrial_date: new Date().toISOString().split('T')[0]
       }
-      setWeatherData(weather)
+      setWeatherData(demoWeather)
+      setLoading(false)
+
+      // Try to fetch live data from NASA API
+      try {
+        const response = await axios.get('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos', {
+          params: {
+            api_key: API_KEY,
+            sol: 0,
+            page: 1
+          }
+        })
+
+        if (response.data?.photos?.[0]) {
+          const photo = response.data.photos[0]
+          const liveWeather: MarsWeather = {
+            sol: photo.sol || 4000,
+            avgTemp: -75,
+            maxTemp: -40,
+            minTemp: -120,
+            pressure: 650,
+            windSpeed: 15,
+            sunDuration: 0,
+            season: 'Ls 180°',
+            terrestrial_date: photo.earth_date || demoWeather.terrestrial_date
+          }
+          setWeatherData(liveWeather)
+        }
+      } catch (apiErr) {
+        console.log('Live API data unavailable, using demo data:', apiErr)
+        // Keep demo data showing
+      }
     } catch (err) {
-      console.error('Error fetching Mars weather:', err)
-      setError('Unable to fetch live data. Please try refreshing the page.')
-    } finally {
+      console.error('Error:', err)
       setLoading(false)
     }
   }
